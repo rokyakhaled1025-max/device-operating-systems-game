@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لعبة أنظمة التشغيل</title>
+<style>
+:root{
+  --bg:#F4F8FD; --ink:#2E3A55; --mauve:#5B4B8A; --mauve-d:#44376b;
+  --blue:#7FB5E3; --blue-l:#DCEBFA; --yel:#F5D36B; --yel-l:#FFF3C4;
+  --lav:#B9A5E0; --lav-l:#E8E0F6;
+  --ok:#CFEBDA; --ok-d:#2F7A55; --bad:#F7D4DA; --bad-d:#9B3B4C;
+  --shadow:0 6px 18px rgba(110,130,170,.18);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Segoe UI",Tahoma,"Noto Sans Arabic",Arial,sans-serif;}
+body{min-height:100vh;display:flex;justify-content:center}
+#app{width:100%;max-width:1000px;padding:20px 16px 40px}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+button:focus-visible{outline:3px solid var(--mauve);outline-offset:2px}
+.btn{background:var(--mauve);color:#fff;border-radius:999px;padding:12px 30px;font-size:19px;font-weight:700;
+  box-shadow:0 4px 0 var(--mauve-d)}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--mauve-d)}
+.btn.sec{background:#fff;color:var(--mauve);box-shadow:0 4px 0 #D4DCEC}
+.btn.sm{padding:8px 18px;font-size:16px}
+
+/* home */
+.hero{display:flex;align-items:center;justify-content:space-between;gap:24px;background:var(--blue-l);
+  border-radius:28px;padding:26px 34px;margin-bottom:18px}
+.hero h1{font-size:clamp(28px,5.2vw,48px);margin:0 0 10px;color:var(--mauve)}
+.hero p{margin:0;font-size:clamp(15px,2.4vw,20px);line-height:1.6}
+.hero svg{width:150px;height:150px;flex:none}
+.settings{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.seg{display:inline-flex;background:#fff;border-radius:999px;padding:4px;box-shadow:var(--shadow)}
+.seg button{background:transparent;padding:8px 22px;border-radius:999px;font-weight:700;font-size:16px}
+.seg button.on{background:var(--yel);color:var(--mauve)}
+.lab{font-weight:700}
+.menu{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.gcard{background:#fff;border-radius:24px;padding:22px;text-align:right;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:10px;transition:transform .15s}
+.gcard:hover{transform:translateY(-3px)}
+.gcard .ic{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:30px;font-weight:700;color:var(--mauve)}
+.gcard h2{margin:4px 0 0;font-size:22px;color:var(--mauve)}
+.gcard p{margin:0;line-height:1.6;font-size:16px;flex:1}
+.gcard .bst{font-size:14px;opacity:.75;min-height:20px}
+.foot{margin-top:22px;text-align:center;font-size:14px;opacity:.7}
+
+/* top / hud */
+.top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.top h2{margin:0;font-size:clamp(18px,3vw,24px);color:var(--mauve);flex:1}
+.hud{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;min-height:42px}
+.chip{background:#fff;border-radius:999px;padding:8px 18px;font-size:17px;box-shadow:var(--shadow)}
+.chip b{font-size:20px;margin-inline-start:4px;color:var(--mauve)}
+.hearts span{color:var(--lav);font-size:22px;margin:0 2px}
+.hearts span.off{opacity:.25}
+.chip.team{border:3px solid transparent;opacity:.65}
+.chip.team.t0{background:var(--blue-l)} .chip.team.t1{background:var(--yel-l)}
+.chip.team.on{opacity:1;border-color:var(--mauve);transform:scale(1.05)}
+.chip.streak{background:var(--yel-l)}
+
+/* question */
+.meta{font-size:15px;opacity:.75;margin-bottom:8px}
+.timer{height:10px;border-radius:99px;background:#E3EAF6;overflow:hidden;margin-bottom:14px}
+.timer i{display:block;height:100%;width:100%;background:var(--yel);transition:width .1s linear,background .3s}
+.timer i.low{background:var(--lav)}
+.turn{display:inline-block;padding:6px 18px;border-radius:999px;font-weight:700;margin-bottom:10px}
+.turn.t0{background:var(--blue-l)} .turn.t1{background:var(--yel-l)}
+.qcard{background:#fff;border-radius:24px;padding:26px;font-size:clamp(20px,3.6vw,32px);font-weight:700;
+  text-align:center;box-shadow:var(--shadow);min-height:130px;display:flex;align-items:center;justify-content:center;line-height:1.6}
+.qcard.big{font-size:clamp(28px,6vw,52px);min-height:170px}
+.opts{display:grid;gap:12px;margin-top:16px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opt{padding:20px 14px;border-radius:18px;font-size:clamp(17px,2.8vw,25px);font-weight:700;background:var(--blue-l);
+  box-shadow:0 4px 0 rgba(0,0,0,.06);text-align:center;transition:transform .1s}
+.opt:nth-child(2){background:var(--yel-l)} .opt:nth-child(3){background:var(--lav-l)} .opt:nth-child(4){background:#E6F1FB}
+.opt:hover:not(:disabled){transform:translateY(-2px)}
+.opt:disabled{cursor:default}
+.opt.ok{background:var(--ok)!important;outline:3px solid var(--ok-d)}
+.opt.bad{background:var(--bad)!important;outline:3px solid var(--bad-d)}
+.fb{margin-top:16px;border-radius:20px;padding:16px 22px;display:flex;gap:14px;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;font-size:19px;line-height:1.6}
+.fb.ok{background:var(--ok)} .fb.bad{background:var(--bad)}
+.fb .m{flex:1;min-width:200px}
+.fb .m b{display:block;font-size:22px}
+
+/* intro / result */
+.panel{background:#fff;border-radius:28px;padding:34px 28px;text-align:center;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:center;gap:16px}
+.panel h2{margin:0;font-size:clamp(24px,4.4vw,38px);color:var(--mauve)}
+.panel p{margin:0;font-size:clamp(16px,2.6vw,21px);line-height:1.8;max-width:640px}
+.panel .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.big-score{font-size:clamp(44px,9vw,76px);font-weight:800;color:var(--mauve);line-height:1}
+.stars{display:flex;gap:8px}
+.stars svg{width:54px;height:54px}
+.teamres{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.teamres .chip{font-size:22px;padding:14px 26px}
+
+/* memory */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.mc{perspective:800px;aspect-ratio:4/3;background:transparent;padding:0}
+.mc .in{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.mc.open .in{transform:rotateY(180deg)}
+.mc .f{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-weight:700;
+  font-size:clamp(13px,2.3vw,20px);line-height:1.5;box-shadow:var(--shadow)}
+.mc .b{background:var(--lav);color:#fff;font-size:clamp(26px,5vw,44px)}
+.mc .fr{transform:rotateY(180deg)}
+.mc.n .fr{background:var(--blue-l);color:var(--mauve);font-size:clamp(16px,3vw,26px)}
+.mc.d .fr{background:var(--yel-l)}
+.mc.done .fr{background:var(--ok);outline:3px solid var(--ok-d)}
+
+@media (max-width:760px){
+  .menu{grid-template-columns:1fr}
+  .hero{flex-direction:column-reverse;text-align:center;padding:20px}
+  .hero svg{width:100px;height:100px}
+  .grid{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:480px){ .opts.two{grid-template-columns:1fr 1fr} .qcard{padding:18px} }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+"use strict";
+/* ============ بيانات اللعبة (من الدرس الخامس) ============ */
+const SORT_ROUNDS = [
+  { title:'كمبيوتر أم هاتف؟', sub:'اختر الجهاز الذي يعمل عليه النظام أو الوصف.', opts:['كمبيوتر','هاتف محمول'], time:10,
+    items:[['Windows',0],['macOS',0],['Android',1],['iOS',1],['نظام أجهزة MacBook وiMac',0],['نظام هواتف آيفون',1],
+           ['النظام الذي تستخدمه معظم شركات الموبايل',1],['الأكثر استخدامًا على الكمبيوتر المكتبي والمحمول',0]] },
+  { title:'مفتوح أم مغلق المصدر؟', sub:'النظام المفتوح يمكن لأي شخص رؤية كوده وتعديله، والمغلق لا يعدّله إلا الشركة المالكة.', opts:['مفتوح المصدر','مغلق المصدر'], time:10,
+    items:[['Android',0],['iOS',1],['Windows',1],['يمكن لأي شخص رؤية كوده البرمجي وتعديله',0],['لا يعدّل كوده إلا الشركة المالكة له',1],['نظام لا يمكنك تعديل كوده البرمجي',1]] },
+  { title:'صح أم خطأ؟', sub:'اقرأ العبارة جيدًا ثم اختر.', opts:['صح ✔','خطأ ✘'], time:14, text:true,
+    items:[
+      ['نظام التشغيل هو البرنامج الرئيسي الذي يدير كل شيء في الجهاز.',0],
+      ['نظام التشغيل Windows هو نظام مغلق المصدر.',0],
+      ['لغة HTML هي نوع من أنواع أنظمة التشغيل.',1,'HTML لغة لتصميم صفحات الويب، وليست نظام تشغيل.'],
+      ['نظام التشغيل Android مفتوح المصدر.',0],
+      ['تعمل أجهزة كمبيوتر Apple على نظام Windows فقط.',1,'أجهزة آبل تعمل بنظام macOS.'],
+      ['يُعتبر نظام iOS نظامًا مفتوح المصدر.',1,'iOS نظام مغلق المصدر.'],
+      ['نظام التشغيل برنامج يتحكم في وظائف الكمبيوتر.',0],
+      ['أكثر أنظمة تشغيل الهواتف شيوعًا هو Windows.',1,'الأكثر شيوعًا للهواتف هو Android.'],
+      ['يجعل نظام التشغيل جميع أجزاء الجهاز تعمل معًا في تناغم.',0],
+      ['macOS هو نظام تشغيل أجهزة آبل مثل MacBook وiMac.',0] ] }
+];
+const QUIZ = [
+  ['أي نظام تشغيل من أنظمة الهواتف التالية يُعتبر مغلق المصدر؟',['Windows','Android','iOS','Linux'],2,'iOS نظام مغلق المصدر.'],
+  ['ما دور نظام التشغيل في الجهاز؟',['كتابة النصوص','إدارة كل أجزاء الجهاز وتفاعل بعضها مع بعض','تشغيل الألعاب فقط','عرض صفحات الويب'],1],
+  ['يُستخدم نظام التشغيل macOS على أجهزة ........',['هواتف الأندرويد','شاشة الكمبيوتر','الكمبيوتر المحمولة من آبل','لوحة المفاتيح'],2],
+  ['في تشبيه المطعم، من يمثّل نظام التشغيل؟',['الزبون','المدير','الطباخ','قائمة الطعام'],1,'المدير يقرر من يعمل ومتى، تمامًا مثل نظام التشغيل.'],
+  ['في تشبيه المطعم، ماذا يمثّل الموظفون؟',['البرامج','الشاشة','لوحة المفاتيح','الماوس'],0],
+  ['ROS هو نظام تشغيل مخصص لـ ........',['الروبوت','الهاتف المحمول','الكمبيوتر المكتبي','الطابعة'],0],
+  ['أكثر أنظمة تشغيل الهواتف شيوعًا حول العالم هو ........',['iOS','Windows','Android','macOS'],2],
+  ['النظام مفتوح المصدر هو النظام الذي ........',['لا يمكن فتحه','يمكن لأي شخص رؤية كوده وتعديله','يعمل بدون إنترنت','لا يحتاج إلى برامج'],1],
+  ['أي مما يلي نظام تشغيل للكمبيوتر؟',['Android','iOS','Windows','ROS'],2],
+  ['نظام iOS مخصص لـ ........',['أجهزة آيفون وآيباد من آبل','الروبوتات','أجهزة الكمبيوتر المكتبية','السيارات'],0],
+  ['يتحكم نظام التشغيل في تعاملك مع ........',['الشاشة والماوس ولوحة المفاتيح','الهواء والماء','الكتب فقط','الكهرباء فقط'],0],
+  ['أي الأنظمة التالية مغلق المصدر؟',['Android فقط','Windows وiOS','Android وWindows','كلها مفتوحة المصدر'],1]
+];
+const PAIRS = [
+  ['Windows','الأكثر استخدامًا على الكمبيوتر'],
+  ['macOS','نظام أجهزة آبل (MacBook وiMac)'],
+  ['Android','نظام مفتوح المصدر'],
+  ['iOS','هواتف آيفون وأجهزة آيباد'],
+  ['ROS','نظام تشغيل الروبوت'],
+  ['نظام التشغيل','المدير في تشبيه المطعم']
+];
+const TEAM = ['الفريق الأزرق','الفريق الأصفر'];
+
+/* ============ أدوات ============ */
+const app = document.getElementById('app');
+const el = (tag, cls, html) => { const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; };
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('os5_'+k); return v===null?d:JSON.parse(v); }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem('os5_'+k, JSON.stringify(v)); }catch(e){} }
+};
+const state = { mode: store.get('mode','solo'), sound: store.get('sound',true) };
+let TM = { q:null, m:null };
+function clearTimers(){ clearInterval(TM.q); clearInterval(TM.m); TM.q=TM.m=null; }
+
+let ac=null;
+function tone(f,d,type,v){
+  if(!state.sound) return;
+  try{
+    ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(), g=ac.createGain();
+    o.type=type||'sine'; o.frequency.value=f; g.gain.value=v||0.12;
+    o.connect(g); g.connect(ac.destination); o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime+d); o.stop(ac.currentTime+d);
+  }catch(e){}
+}
+const sfx = {
+  ok(){ tone(660,.14); setTimeout(()=>tone(880,.22),130); },
+  bad(){ tone(220,.35,'triangle',.15); },
+  flip(){ tone(520,.06,'sine',.06); },
+  win(){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>tone(f,.25),i*140)); }
+};
+function starsSVG(n){
+  let s='<div class="stars">';
+  for(let i=0;i<3;i++){
+    s+=`<svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z" fill="${i<n?'#F5D36B':'#E3EAF6'}" stroke="${i<n?'#C9A227':'#C9D3E6'}" stroke-width="1"/></svg>`;
+  }
+  return s+'</div>';
+}
+function teamChips(sc,cur){
+  return [0,1].map(t=>`<span class="chip team t${t} ${cur===t?'on':''}">${TEAM[t]} <b>${sc[t]}</b></span>`).join('');
+}
+function bestGet(key){ return store.get('best_'+key, null); }
+function bestSave(key,val,lowerBetter){
+  const old=bestGet(key); const isNew = old===null || (lowerBetter? val<old : val>old);
+  if(isNew) store.set('best_'+key,val);
+  return isNew;
+}
+function topBar(title){
+  const t=el('div','top');
+  const back=el('button','btn sec sm','← القائمة'); back.onclick=home;
+  t.append(back, el('h2',null,title));
+  return t;
+}
+
+/* ============ الشاشة الرئيسية ============ */
+function home(){
+  clearTimers();
+  const bs=bestGet('sort'), bq=bestGet('quiz'), bm=bestGet('memory');
+  app.innerHTML = `
+  <section class="hero">
+    <div>
+      <h1>لعبة أنظمة التشغيل</h1>
+      <p>الدرس الخامس: كيف تعمل أنظمة تشغيل الأجهزة<br>تكنولوجيا المعلومات والاتصالات – الصف السادس الابتدائي</p>
+    </div>
+    <svg viewBox="0 0 150 150" aria-hidden="true">
+      <circle cx="75" cy="78" r="64" fill="#fff"/><circle cx="75" cy="78" r="48" fill="#E8E0F6"/>
+      <circle cx="75" cy="78" r="26" fill="#F5D36B"/><circle cx="118" cy="28" r="18" fill="#7FB5E3"/>
+      <circle cx="30" cy="122" r="15" fill="#B9A5E0"/>
+    </svg>
+  </section>
+  <section class="settings">
+    <span class="lab">طريقة اللعب:</span>
+    <div class="seg" id="seg"><button data-m="solo" class="${state.mode==='solo'?'on':''}">لاعب واحد</button><button data-m="teams" class="${state.mode==='teams'?'on':''}">فريقان</button></div>
+    <button class="btn sec sm" id="snd">${state.sound?'🔊 الصوت يعمل':'🔇 الصوت مغلق'}</button>
+  </section>
+  <section class="menu">
+    <button class="gcard" data-g="sort"><div class="ic" style="background:var(--blue-l)">⇄</div><h2>صنّف بسرعة</h2>
+      <p>ثلاث جولات: كمبيوتر أم هاتف؟ مفتوح أم مغلق المصدر؟ صح أم خطأ؟ والوقت يجري!</p>
+      <div class="bst">${bs!==null?'أفضل نتيجة: '+bs+' نقطة':''}</div></button>
+    <button class="gcard" data-g="quiz"><div class="ic" style="background:var(--yel-l)">؟</div><h2>اختر الإجابة</h2>
+      <p>اثنا عشر سؤالًا من الدرس بأربعة اختيارات، مع شرح بعد كل إجابة.</p>
+      <div class="bst">${bq!==null?'أفضل نتيجة: '+bq+' نقطة':''}</div></button>
+    <button class="gcard" data-g="memory"><div class="ic" style="background:var(--lav-l)">▦</div><h2>لعبة الذاكرة</h2>
+      <p>اقلب البطاقات وطابق كل نظام تشغيل مع وصفه الصحيح.</p>
+      <div class="bst">${bm!==null?'أقل محاولات: '+bm:''}</div></button>
+  </section>
+  <p class="foot">اللعبة تعمل بدون إنترنت · في وضع الفريقين يجيب الفريقان بالتناوب</p>`;
+  app.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{ state.mode=b.dataset.m; store.set('mode',state.mode); home(); });
+  document.getElementById('snd').onclick=()=>{ state.sound=!state.sound; store.set('sound',state.sound); home(); if(state.sound) sfx.ok(); };
+  app.querySelectorAll('.gcard').forEach(b=>b.onclick=()=>{
+    const g=b.dataset.g; if(g==='sort') startSort(); else if(g==='quiz') startQuiz(); else startMemory();
+  });
+}
+
+/* ============ شاشة النتيجة ============ */
+function resultScreen(o){
+  clearTimers();
+  app.innerHTML='';
+  app.append(topBar(o.name));
+  const p=el('div','panel');
+  p.append(el('h2',null,o.title));
+  if(o.stars!==undefined) p.insertAdjacentHTML('beforeend',starsSVG(o.stars));
+  if(o.big) p.append(el('div','big-score',o.big));
+  if(o.teams) p.insertAdjacentHTML('beforeend','<div class="teamres">'+teamChips(o.teams,-1)+'</div>');
+  (o.lines||[]).forEach(l=>p.append(el('p',null,l)));
+  const row=el('div','row');
+  const again=el('button','btn','العب مرة أخرى'); again.onclick=o.again;
+  const hm=el('button','btn sec','القائمة الرئيسية'); hm.onclick=home;
+  row.append(again,hm); p.append(row); app.append(p);
+  if(o.sound!==false) sfx.win();
+}
+function rulesScreen(name,html,go){
+  clearTimers();
+  app.innerHTML='';
+  app.append(topBar(name));
+  const p=el('div','panel');
+  p.append(el('h2',null,name), el('p',null,html));
+  const b=el('button','btn','ابدأ'); b.onclick=go; p.append(b); app.append(p);
+}
+const soloRules = 'لديك ٣ قلوب، وكل إجابة صحيحة تعطيك ١٠ نقاط، وثلاث إجابات صحيحة متتالية تعطيك ٥ نقاط إضافية.';
+const teamRules = 'يجيب الفريقان بالتناوب (الأزرق ثم الأصفر)، وكل إجابة صحيحة تعطي فريقها ١٠ نقاط.';
+
+/* ============ محرك الأسئلة (صنّف بسرعة + اختر الإجابة) ============ */
+function startSort(){
+  const items=[];
+  SORT_ROUNDS.forEach(r=>{
+    items.push({intro:true,title:r.title,sub:r.sub});
+    shuffle(r.items).slice(0,8).forEach(it=>{
+      items.push({q:it[0],opts:r.opts,a:it[1],why:it[2],time:r.time,big:!r.text,fixed:true,round:r.title});
+    });
+  });
+  playQuestions({key:'sort',name:'صنّف بسرعة',items});
+}
+function startQuiz(){
+  const items=[{intro:true,title:'اختر الإجابة الصحيحة',sub:'اقرأ السؤال جيدًا ثم اختر إجابة واحدة.'}];
+  shuffle(QUIZ).forEach(q=>items.push({q:q[0],opts:q[1],a:q[2],why:q[3],time:22,big:false,fixed:false,round:'اختر الإجابة'}));
+  playQuestions({key:'quiz',name:'اختر الإجابة',items});
+}
+function playQuestions(cfg){
+  const solo = state.mode==='solo';
+  const G={score:0,lives:3,streak:0,correct:0,total:0,scores:[0,0],team:0,i:0,qn:0};
+  const qTotal=cfg.items.filter(x=>!x.intro).length;
+  rulesScreen(cfg.name, (solo?soloRules:teamRules)+'<br>اضغط «ابدأ» عندما تكون جاهزًا.', ()=>{ buildStage(); next(); });
+
+  let hudEl, stage, locked=false;
+  function buildStage(){
+    app.innerHTML=''; app.append(topBar(cfg.name));
+    hudEl=el('div','hud'); stage=el('div'); app.append(hudEl,stage); drawHud();
+  }
+  function drawHud(){
+    if(solo){
+      hudEl.innerHTML=`<span class="chip">النقاط <b>${G.score}</b></span>
+        <span class="chip hearts">${[0,1,2].map(k=>`<span class="${k<G.lives?'':'off'}">♥</span>`).join('')}</span>`+
+        (G.streak>=2?`<span class="chip streak">تتابع ${G.streak}</span>`:'');
+    } else hudEl.innerHTML=teamChips(G.scores,G.team);
+  }
+  function next(){
+    clearInterval(TM.q); locked=false;
+    if(G.i>=cfg.items.length || (solo && G.lives<=0)) return finish();
+    const it=cfg.items[G.i++];
+    if(it.intro) return showIntro(it);
+    showQ(it);
+  }
+  function showIntro(it){
+    stage.innerHTML='';
+    const p=el('div','panel'); p.append(el('h2',null,it.title), el('p',null,it.sub));
+    const b=el('button','btn','هيا'); b.onclick=next; p.append(b); stage.append(p);
+  }
+  function showQ(it){
+    G.team = G.qn % 2; G.qn++; drawHud();
+    const opts = it.fixed ? it.opts.map((t,i)=>({t,ok:i===it.a})) : shuffle(it.opts.map((t,i)=>({t,ok:i===it.a})));
+    stage.innerHTML='';
+    stage.append(el('div','meta',`${it.round} · سؤال ${G.qn} من ${qTotal}`));
+    if(!solo) stage.append(el('div','turn t'+G.team,'دور '+TEAM[G.team]));
+    const tm=el('div','timer','<i></i>'); const bar=tm.firstChild; stage.append(tm);
+    stage.append(el('div','qcard'+(it.big?' big':''),it.q));
+    const og=el('div','opts '+(opts.length===2?'two':'two')); const btns=[];
+    opts.forEach(o=>{
+      const b=el('button','opt',o.t); b._ok=o.ok; btns.push(b);
+      b.onclick=()=>answer(o.ok,b,false); og.append(b);
+    });
+    stage.append(og);
+    const fbBox=el('div'); stage.append(fbBox);
+    let left=it.time*1000, last=Date.now();
+    TM.q=setInterval(()=>{
+      const now=Date.now(); left-=now-last; last=now;
+      bar.style.width=Math.max(0,left/(it.time*1000)*100)+'%';
+      if(left<3000) bar.classList.add('low');
+      if(left<=0){ answer(false,null,true); }
+    },100);
+    function answer(ok,btn,timeout){
+      if(locked) return; locked=true; clearInterval(TM.q);
+      G.total++;
+      btns.forEach(b=>{ b.disabled=true; if(b._ok) b.classList.add('ok'); });
+      if(btn && !ok) btn.classList.add('bad');
+      let msg;
+      if(ok){
+        G.correct++; G.streak++;
+        let pts=10; if(solo && G.streak>=3) pts+=5;
+        if(solo) G.score+=pts; else G.scores[G.team]+=10;
+        msg=`<b>أحسنت! ✔</b>${it.why||''}`; sfx.ok();
+      } else {
+        G.streak=0; if(solo) G.lives--;
+        const right=opts.find(o=>o.ok).t;
+        msg=`<b>${timeout?'انتهى الوقت ⏱':'إجابة غير صحيحة ✘'}</b>الإجابة الصحيحة: ${right}${it.why?'<br>'+it.why:''}`; sfx.bad();
+      }
+      drawHud();
+      const last = G.i>=cfg.items.length || (solo && G.lives<=0);
+      fbBox.className='fb '+(ok?'ok':'bad'); fbBox.innerHTML=`<div class="m">${msg}</div>`;
+      const nb=el('button','btn',last?'النتيجة':'التالي'); nb.onclick=next; fbBox.append(nb);
+      nb.focus();
+    }
+  }
+  function finish(){
+    if(!solo){
+      const [a,b]=G.scores; const w=a===b?'تعادل!':(a>b?'فاز '+TEAM[0]+'!':'فاز '+TEAM[1]+'!');
+      return resultScreen({name:cfg.name,title:w,teams:G.scores,lines:['أحسن الفريقان! نتيجة كل فريق موضحة أعلاه.'],again:cfg.key==='sort'?startSort:startQuiz,sound:true});
+    }
+    const acc=G.total?G.correct/G.total:0;
+    const dead=G.lives<=0;
+    const stars = dead?(acc>=.5?1:0):(acc>=.9?3:acc>=.65?2:1);
+    const isNew=bestSave(cfg.key,G.score,false);
+    resultScreen({name:cfg.name,title:dead?'انتهت المحاولات':'أحسنت! أنهيت اللعبة',stars,big:G.score+' نقطة',
+      lines:[`إجابات صحيحة: ${G.correct} من ${G.total}`, isNew?'نتيجة جديدة هي الأفضل لديك!':'أفضل نتيجة سابقة: '+bestGet(cfg.key)+' نقطة'],
+      again:cfg.key==='sort'?startSort:startQuiz,sound:!dead});
+  }
+}
+
+/* ============ لعبة الذاكرة ============ */
+function startMemory(){
+  const solo = state.mode==='solo';
+  const cards=[]; PAIRS.forEach((p,i)=>{ cards.push({pair:i,t:p[0],k:'n'}); cards.push({pair:i,t:p[1],k:'d'}); });
+  const deck=shuffle(cards);
+  const M={moves:0,secs:0,matched:0,first:null,lock:false,team:0,scores:[0,0],started:false};
+  rulesScreen('لعبة الذاكرة',
+    'اقلب بطاقتين: اسم النظام ووصفه الصحيح. كل ما تطابقه يبقى مفتوحًا.'+(solo?'<br>حاول أن تنهي اللعبة بأقل عدد من المحاولات.':'<br>يجيب الفريقان بالتناوب، ومن يطابق صح يكمل دوره.'),
+    build);
+  let hud;
+  function drawHud(){
+    if(solo){
+      const m=String(Math.floor(M.secs/60)).padStart(2,'0'), s=String(M.secs%60).padStart(2,'0');
+      hud.innerHTML=`<span class="chip">المحاولات <b>${M.moves}</b></span><span class="chip">الزمن <b>${m}:${s}</b></span><span class="chip">المطابقة <b>${M.matched}/6</b></span>`;
+    } else hud.innerHTML=teamChips(M.scores,M.team);
+  }
+  function build(){
+    app.innerHTML=''; app.append(topBar('لعبة الذاكرة'));
+    hud=el('div','hud'); app.append(hud);
+    const grid=el('div','grid'); app.append(grid);
+    deck.forEach(c=>{
+      const b=el('button','mc '+c.k,`<div class="in"><div class="f b">؟</div><div class="f fr">${c.t}</div></div>`);
+      c.node=b; b.onclick=()=>flip(c); grid.append(b);
+    });
+    drawHud();
+  }
+  function flip(c){
+    if(M.lock || c.open || c.done) return;
+    if(!M.started && solo){ M.started=true; TM.m=setInterval(()=>{ M.secs++; drawHud(); },1000); }
+    c.open=true; c.node.classList.add('open'); sfx.flip();
+    if(!M.first){ M.first=c; return; }
+    const a=M.first; M.first=null; M.moves++;
+    if(a.pair===c.pair){
+      M.lock=true;
+      setTimeout(()=>{
+        a.done=c.done=true; a.node.classList.add('done'); c.node.classList.add('done');
+        M.matched++; if(!solo) M.scores[M.team]++; sfx.ok(); M.lock=false; drawHud();
+        if(M.matched===PAIRS.length) setTimeout(finish,700);
+      },450);
+    } else {
+      M.lock=true;
+      setTimeout(()=>{
+        a.open=c.open=false; a.node.classList.remove('open'); c.node.classList.remove('open');
+        if(!solo) M.team=1-M.team; M.lock=false; sfx.bad(); drawHud();
+      },1100);
+    }
+    drawHud();
+  }
+  function finish(){
+    clearInterval(TM.m);
+    if(!solo){
+      const [a,b]=M.scores; const w=a===b?'تعادل!':(a>b?'فاز '+TEAM[0]+'!':'فاز '+TEAM[1]+'!');
+      return resultScreen({name:'لعبة الذاكرة',title:w,teams:M.scores,lines:['عدد الأزواج التي طابقها كل فريق موضح أعلاه.'],again:startMemory});
+    }
+    const stars=M.moves<=9?3:M.moves<=14?2:1;
+    const isNew=bestSave('memory',M.moves,true);
+    resultScreen({name:'لعبة الذاكرة',title:'أحسنت! طابقت كل البطاقات',stars,big:M.moves+' محاولة',
+      lines:[`الزمن: ${M.secs} ثانية`, isNew?'رقم قياسي جديد لديك!':'أقل عدد محاولات سابق: '+bestGet('memory')],again:startMemory});
+  }
+}
+
+home();
+</script>
+</body>
+</html>
